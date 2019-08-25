@@ -7,7 +7,7 @@ import android.graphics.Paint;
 public class Food {
 
     private final String TAG = getClass().getName().toString();
-    private final int SIZE = 20;
+    private final int SIZE = 22;
 
     private Snake snake;
     private int x;
@@ -49,8 +49,8 @@ public class Food {
     }
 
     public void newPosition() {
-        x = (int) (Math.random() * (GameView.dWidth - SIZE*9));
-        y = (int) (Math.random() * (GameView.dHeight - SIZE*7));
+        x = (int) (Math.random() * (GameView.dWidth - SIZE*9)) + 3*SIZE;
+        y = (int) (Math.random() * (GameView.dHeight - SIZE*7)) + 3*SIZE;
     }
 
     public boolean snakeCollision(Snake s) {
