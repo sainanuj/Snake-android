@@ -7,16 +7,16 @@ import android.graphics.Paint;
 public class Food {
 
     private final String TAG = getClass().getName().toString();
-    private final int SIZE = 15;
+    private final int SIZE = 20;
 
     private Snake snake;
     private int x;
     private int y;
-    private int score = 0;
+    public static int score = 0;
     private Paint fillPaint;
 
-    public int getScore() {
-        return this.score;
+    public static int getScore() {
+        return score;
     }
 
     public Food(Snake snake) {
@@ -32,7 +32,7 @@ public class Food {
     public void draw(Canvas canvas) {
         if (snake.isMoving()) {
             fillPaint.setColor(Color.WHITE);
-            canvas.drawText("" + score, (int) GameView.dWidth - 100,
+            canvas.drawText("" + score, (int) GameView.dWidth - 170,
                     (int)100, fillPaint);
             fillPaint.setColor(Color.GREEN);
             canvas.drawCircle((float) x, (float) y, (float) SIZE, fillPaint);
@@ -41,6 +41,7 @@ public class Food {
 
     public void update() {
         if (snakeCollision(snake)) {
+            GameView.playSound(GameView.eat, false);
             newPosition();
             score++;
             snake.setElongate(true);
@@ -48,8 +49,8 @@ public class Food {
     }
 
     public void newPosition() {
-        x = (int) (Math.random() * (GameView.dWidth - SIZE));
-        y = (int) (Math.random() * (GameView.dHeight - SIZE));
+        x = (int) (Math.random() * (GameView.dWidth - SIZE*9));
+        y = (int) (Math.random() * (GameView.dHeight - SIZE*7));
     }
 
     public boolean snakeCollision(Snake s) {
@@ -105,7 +106,7 @@ public class Food {
         return false;
     }
 
-    public void reeet() {
-        this.score = 0;
+    public static void reet() {
+        score = 0;
     }
 }

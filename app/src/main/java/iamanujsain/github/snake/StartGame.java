@@ -13,12 +13,16 @@ public class StartGame extends Activity {
     GameView gameView;
     boolean exit;
 
+    public static Activity startGameActivity;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setTheme(R.style.AppTheme);
         super.onCreate(savedInstanceState);
         gameView = new GameView(this);
         setContentView(gameView);
+
+        startGameActivity = this;
 
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);

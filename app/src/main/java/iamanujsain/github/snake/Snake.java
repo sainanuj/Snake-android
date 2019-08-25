@@ -1,9 +1,16 @@
 package iamanujsain.github.snake;
 
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,22 +18,24 @@ import java.util.List;
 public class Snake {
 
     private final String TAG = getClass().getName().toString();
-    private final int STARTSIZE = 10;
+    private final int STARTSIZE = 5;
     private final int STARTX = GameView.dWidth / 2;
     private final int STARTY = GameView.dHeight / 2;
-    private final int CELLSIZE = 20;
+    private final int CELLSIZE = 30;
 
     private boolean elongate;
     private boolean isMoving;
     private int dx = 1;
     private int dy = 0;
 
+    private Context context;
     private Rect r;
     private Paint fillPaint;
 
-    protected List<Cell> snakePoints;
+    List<Cell> snakePoints;
 
-    public Snake() {
+    public Snake(Context context) {
+        this.context = context;
         init();
     }
 
@@ -79,12 +88,12 @@ public class Snake {
             snakePoints.set(0, newCell);
 
             if (elongate) {
-                snakePoints.add(newCell);
+                snakePoints.add(last);
                 setElongate(false);
             }
 
             moveThroughWalls();
-//            snakeCollision();
+            snakeCollision();
         }
     }
 
@@ -110,14 +119,28 @@ public class Snake {
     }
 
     private void snakeCollision() {
-        int headX = snakePoints.get(0).getX();
-        int headY = snakePoints.get(0).getY();
+        int headX = snakePoints.get(0).getX() + CELLSIZE/2;
+        int headY = snakePoints.get(0).getY() + CELLSIZE/2;
 
-        for (int i = 1; i < snakePoints.size(); i++) {
-            if (snakePoints.get(i).getX() == headX && snakePoints.get(i).getY() == headY) {
-                setMoving(false);
+        for (int i = 2; i < snakePoints.size(); i++) {
+            if (headX > snakePoints.get(i).getX() && headX < snakePoints.get(i).getX() + CELLSIZE) {
+                if (headY > this.snakePoints.get(i).getY() && headY < this.snakePoints.get(i).getY()
+                + CELLSIZE) {
+                    setMoving(false);
+                    showGameOver();
+                }
             }
         }
+    }
+
+    void showGameOver() {
+       Intent intent = new Intent(context, GameOver.class);
+       StartGame.startGameActivity.startActivity(intent);
+       StartGame.startGameActivity.finish();
+    }
+
+    void reset() {
+        snakePoints.clear();
     }
 
     public boolean isElongate() {

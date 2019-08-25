@@ -7,6 +7,8 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.media.AudioManager;
+import android.media.SoundPool;
 import android.os.Handler;
 import android.view.Display;
 import android.view.MotionEvent;
@@ -25,9 +27,21 @@ public class GameView extends View {
 
     private float previousX;
     private float previousY;
+    private int fps;
+
+    public static SoundPool soundPool;
+    public static int up, down, left, right, eat;
 
     public GameView(Context context) {
         super(context);
+
+        soundPool = new SoundPool(5, AudioManager.STREAM_MUSIC, 0);
+
+        down = soundPool.load(getContext(), R.raw.down, 1);
+        up = soundPool.load(getContext(), R.raw.up, 1);
+        eat = soundPool.load(getContext(), R.raw.eat, 1);
+        left = soundPool.load(getContext(), R.raw.left, 1);
+        right = soundPool.load(getContext(), R.raw.right, 1);
 
         fillPaint = new Paint();
         fillPaint.setStyle(Paint.Style.FILL);
@@ -43,7 +57,7 @@ public class GameView extends View {
 
         r = new Rect(0, 0, dWidth, dHeight);
 
-        snake = new Snake();
+        snake = new Snake(context);
         food = new Food(snake);
 
         handler = new Handler();
@@ -54,6 +68,18 @@ public class GameView extends View {
                 invalidate();
             }
         };
+
+        switch (MainActivity.LEVEL) {
+            case 1:
+                fps = 15;
+                break;
+            case 2:
+                fps = 21;
+                break;
+            case 3:
+                fps = 30;
+                break;
+        }
     }
 
     void update() {
@@ -66,10 +92,12 @@ public class GameView extends View {
         super.onDraw(canvas);
         canvas.drawRect(r, fillPaint);
 
-        snake.draw(canvas);
-        food.draw(canvas);
+        if (!MainActivity.GAMEOVER) {
+            snake.draw(canvas);
+            food.draw(canvas);
+        }
 
-        handler.postDelayed(runnable, 1000/20);
+        handler.postDelayed(runnable, 1000/fps);
     }
 
     @Override
@@ -91,11 +119,13 @@ public class GameView extends View {
                 if (deltaX > deltaY) {
                     if (finalX > previousX) {
                         if (snake.getDx() != -1 && snake.isMoving()) {
+                            playSound(right, false);
                             snake.setDy(0);
                             snake.setDx(1);
                         }
                     } else if (finalX < previousX) {
                         if (snake.getDx() != 1 && snake.isMoving()) {
+                            playSound(left, false);
                             snake.setDy(0);
                             snake.setDx(-1);
                         }
@@ -105,11 +135,13 @@ public class GameView extends View {
                 if (deltaX < deltaY) {
                     if (finalY > previousY) {
                         if (snake.getDy() != -1 && snake.isMoving()) {
+                            playSound(down, false);
                             snake.setDx(0);
                             snake.setDy(1);
                         }
                     } else if (finalY < previousY) {
                         if (snake.getDy() != 1 && snake.isMoving()) {
+                            playSound(up, false);
                             snake.setDx(0);
                             snake.setDy(-1);
                         }
@@ -119,5 +151,20 @@ public class GameView extends View {
                 break;
         }
         return true;
+    }
+
+    public static void playSound(int sound, boolean loop) {
+        if (MainActivity.PLAYSOUND) {
+            if (loop) {
+                soundPool.play(sound, 1, 1, 1, 0, 1f);
+            } else {
+                soundPool.play(sound, 1, 1, 1, 1, 1f);
+            }
+        }
+    }
+
+    public static void clean() {
+        soundPool.release();
+        soundPool = null;
     }
 }
